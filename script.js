@@ -141,7 +141,7 @@ class HTMLToMarkdownConverter {
             outputContent.innerHTML = `<pre class="text-sm text-slate-700 font-mono whitespace-pre-wrap">${this.escapeHtml(this.markdownContent)}</pre>`;
         } else if (view === 'preview') {
             previewBtn.className = 'px-2 py-1 text-xs rounded transition-colors bg-slate-800 text-white';
-            outputContent.innerHTML = `<div class="prose prose-sm max-w-none">${this.renderMarkdownPreview(this.markdownContent)}</div>`;
+            outputContent.innerHTML = `<div class="prose prose-sm max-w-none text-left">${this.renderMarkdownPreview(this.markdownContent)}</div>`;
         } else if (view === 'html') {
             htmlBtn.className = 'px-2 py-1 text-xs rounded transition-colors bg-slate-800 text-white';
             outputContent.innerHTML = `<pre class="text-sm text-slate-700 font-mono whitespace-pre-wrap">${this.escapeHtml(this.htmlContent)}</pre>`;
@@ -289,15 +289,18 @@ class HTMLToMarkdownConverter {
         const markdown = textarea.value;
 
         if (!markdown.trim()) {
-            preview.innerHTML = '<div class="text-slate-500 italic text-center py-20">Type some Markdown to see the preview...</div>';
+            preview.className = 'prose prose-sm max-w-none text-slate-500 italic text-center py-20';
+            preview.innerHTML = 'Type some Markdown to see the preview...';
             return;
         }
 
         try {
+            preview.className = 'prose prose-sm max-w-none text-left';
             const html = this.renderMarkdownPreview(markdown);
             preview.innerHTML = html;
         } catch (error) {
-            preview.innerHTML = '<div class="text-red-500 text-center py-20">Error rendering preview</div>';
+            preview.className = 'prose prose-sm max-w-none text-red-500 text-center py-20';
+            preview.innerHTML = 'Error rendering preview';
         }
     }
 
