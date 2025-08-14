@@ -11,7 +11,7 @@
     <!-- Marked for Markdown to HTML -->
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
     <!-- Lucide Icons -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen bg-slate-50">
@@ -262,7 +262,7 @@
                                     id="clear-md-btn"
                                     class="px-2 py-1 text-xs bg-white border border-slate-200 hover:bg-slate-50 rounded transition-colors"
                                 >
-                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i> Clear
                                 </button>
                             </div>
                         </div>
@@ -358,7 +358,11 @@
     <script src="script.js"></script>
     <script>
         // Initialize Lucide icons
-        lucide.createIcons();
+        window.addEventListener('load', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
     </script>
 </body>
 </html>
