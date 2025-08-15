@@ -149,6 +149,9 @@ class HTMLToMarkdownConverter {
 
         if (!this.markdownContent) {
             outputContent.innerHTML = '<div class="text-slate-500 italic text-center py-20">Your converted content will appear here...</div>';
+        } else {
+            // Remove any centering classes from the container when content is present
+            outputContent.className = outputContent.className.replace(/text-center/g, '').trim();
         }
     }
 
@@ -184,11 +187,15 @@ class HTMLToMarkdownConverter {
             previewBtn.className = 'px-2 py-1 text-xs rounded transition-colors text-slate-700 hover:bg-slate-200';
             sourceContent.style.display = 'block';
             previewContent.style.display = 'none';
+            // Ensure source content is left-aligned
+            sourceContent.className = sourceContent.className.replace(/text-center/g, '').trim() + ' text-left';
         } else {
             sourceBtn.className = 'px-2 py-1 text-xs rounded transition-colors text-slate-700 hover:bg-slate-200';
             previewBtn.className = 'px-2 py-1 text-xs rounded transition-colors bg-slate-800 text-white';
             sourceContent.style.display = 'none';
             previewContent.style.display = 'block';
+            // Ensure preview content is left-aligned
+            previewContent.className = previewContent.className.replace(/text-center/g, '').trim() + ' text-left';
         }
     }
 
