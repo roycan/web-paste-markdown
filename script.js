@@ -80,6 +80,8 @@ class HTMLToMarkdownConverter {
         document.getElementById('heading-style').addEventListener('change', () => this.updateSettings());
         document.getElementById('code-block-style').addEventListener('change', () => this.updateSettings());
         document.getElementById('bullet-list-marker').addEventListener('change', () => this.updateSettings());
+    const tablesToggle = document.getElementById('convert-tables');
+    if (tablesToggle) tablesToggle.addEventListener('change', () => this.updateSettings());
     }
 
     toggleMode() {
@@ -141,7 +143,7 @@ class HTMLToMarkdownConverter {
             outputContent.innerHTML = `<pre class="text-sm text-slate-700 font-mono whitespace-pre-wrap">${this.escapeHtml(this.markdownContent)}</pre>`;
         } else if (view === 'preview') {
             previewBtn.className = 'px-2 py-1 text-xs rounded transition-colors bg-slate-800 text-white';
-            outputContent.innerHTML = `<div class="prose prose-sm max-w-none text-left">${this.renderMarkdownPreview(this.markdownContent)}</div>`;
+            outputContent.innerHTML = `<div class="prose prose-sm max-w-none text-left">${marked.parse(this.markdownContent || '')}</div>`;
         } else if (view === 'html') {
             htmlBtn.className = 'px-2 py-1 text-xs rounded transition-colors bg-slate-800 text-white';
             outputContent.innerHTML = `<pre class="text-sm text-slate-700 font-mono whitespace-pre-wrap">${this.escapeHtml(this.htmlContent)}</pre>`;
@@ -187,23 +189,14 @@ class HTMLToMarkdownConverter {
             previewBtn.className = 'px-2 py-1 text-xs rounded transition-colors text-slate-700 hover:bg-slate-200';
             sourceContent.style.display = 'block';
             previewContent.style.display = 'none';
-            // Ensure source content is left-aligned
             sourceContent.className = sourceContent.className.replace(/text-center/g, '').trim() + ' text-left';
         } else {
             sourceBtn.className = 'px-2 py-1 text-xs rounded transition-colors text-slate-700 hover:bg-slate-200';
             previewBtn.className = 'px-2 py-1 text-xs rounded transition-colors bg-slate-800 text-white';
             sourceContent.style.display = 'none';
             previewContent.style.display = 'block';
-            // Ensure preview content is left-aligned
             previewContent.className = previewContent.className.replace(/text-center/g, '').trim() + ' text-left';
         }
-    }
-
-    handleRichTextPaste(e) {
-        // Allow default paste behavior to preserve formatting
-        setTimeout(() => {
-            this.updateEditorContent();
-        }, 10);
     }
 
     updateEditorContent() {
@@ -303,7 +296,7 @@ class HTMLToMarkdownConverter {
 
         try {
             preview.className = 'prose prose-sm max-w-none text-left';
-            const html = this.renderMarkdownPreview(markdown);
+            const html = marked.parse(markdown || '');
             preview.innerHTML = html;
         } catch (error) {
             preview.className = 'prose prose-sm max-w-none text-red-500 text-center py-20';
@@ -311,50 +304,9 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    // Legacy method retained for backward compatibility; now simply delegates to Marked
     renderMarkdownPreview(markdown) {
-        // Enhanced markdown preview rendering
-        let html = markdown
-            // Headers
-            .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
-            .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold mt-6 mb-3">$1</h2>')
-            .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-6 mb-4">$1</h1>')
-            
-            // Images
-            .replace(/!\[([^\]]*)\]\(([^)"]+)(?:\s+"([^"]+)")?\)/g, '<img src="$2" alt="$1" title="$3" class="max-w-full h-auto rounded-lg my-4" />')
-            
-            // Links
-            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:text-blue-800 underline">$1</a>')
-            
-            // Bold and italic
-            .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            
-            // Code blocks and inline code
-            .replace(/```([\s\S]*?)```/g, '<pre class="bg-gray-100 p-3 rounded-md overflow-x-auto my-3"><code>$1</code></pre>')
-            .replace(/`([^`]+)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>')
-            
-            // Lists
-            .replace(/^\* (.*$)/gm, '<li class="ml-4 my-1">$1</li>')
-            .replace(/^- (.*$)/gm, '<li class="ml-4 my-1">$1</li>')
-            .replace(/^\+ (.*$)/gm, '<li class="ml-4 my-1">$1</li>')
-            
-            // Blockquotes
-            .replace(/^\> (.*$)/gm, '<blockquote class="border-l-4 border-gray-300 pl-4 italic my-3 text-gray-600">$1</blockquote>')
-            
-            // Line breaks and paragraphs
-            .replace(/\n\n/g, '</p><p class="mb-3">')
-            .replace(/\n/g, '<br>');
-
-        // Wrap consecutive list items in ul tags
-        html = html.replace(/(<li[^>]*>.*?<\/li>(?:\s*<li[^>]*>.*?<\/li>)*)/g, '<ul class="list-disc ml-6 my-3">$1</ul>');
-        
-        // Wrap content in paragraphs if it doesn't start with a block element
-        if (!html.match(/^<(h[1-6]|div|ul|ol|blockquote|pre)/)) {
-            html = '<p class="mb-3">' + html + '</p>';
-        }
-
-        return html;
+        return marked.parse(markdown || '');
     }
 
     updateOutputStats() {
@@ -379,6 +331,7 @@ class HTMLToMarkdownConverter {
         const headingStyle = document.getElementById('heading-style').value;
         const codeBlockStyle = document.getElementById('code-block-style').value;
         const bulletListMarker = document.getElementById('bullet-list-marker').value;
+    const convertTables = document.getElementById('convert-tables') ? document.getElementById('convert-tables').checked : true;
 
         // Recreate Turndown service with new settings
         this.turndownService = new TurndownService({
@@ -386,6 +339,17 @@ class HTMLToMarkdownConverter {
             codeBlockStyle: codeBlockStyle,
             bulletListMarker: bulletListMarker
         });
+
+        // Apply GFM tables plugin if enabled and available
+        if (convertTables && typeof turndownPluginGfm !== 'undefined' && turndownPluginGfm.tables) {
+            try {
+                this.turndownService.use(turndownPluginGfm.tables);
+            } catch (err) {
+                console.warn('[Table Conversion] Failed to enable GFM tables plugin:', err);
+            }
+        } else if (convertTables) {
+            console.warn('[Table Conversion] GFM plugin not loaded; tables will not convert.');
+        }
 
         // Configure rules
         if (!preserveLinks) {

@@ -17,6 +17,7 @@ Simply open the `index.html` file in your web browser - no server needed!
 ### HTML to Markdown Mode (Default)
 - **Paste rich content** from websites, Word documents, or any formatted text
 - **Live conversion** to clean Markdown format
+- **GitHub-Flavored tables** (simple tables) conversion support
 - **Multiple view modes**: Source, Preview, and HTML
 - **Customizable settings** for different markdown styles
 - **Copy and download** your converted content

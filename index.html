@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Turndown for HTML to Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/turndown@7.1.2/dist/turndown.min.js"></script>
+    <!-- Turndown GFM Plugin (tables, strikethrough) -->
+    <script src="https://cdn.jsdelivr.net/npm/turndown-plugin-gfm@1.0.2/dist/turndown-plugin-gfm.min.js"></script>
     <!-- Marked for Markdown to HTML -->
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
     <!-- Lucide Icons -->
@@ -194,6 +196,10 @@
                             <div class="flex items-center space-x-2">
                                 <input type="checkbox" id="clean-html" class="w-4 h-4 text-blue-600 rounded">
                                 <label for="clean-html" class="text-sm font-medium text-slate-700">Clean HTML</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="convert-tables" checked class="w-4 h-4 text-blue-600 rounded">
+                                <label for="convert-tables" class="text-sm font-medium text-slate-700">Convert Tables (GFM)</label>
                             </div>
                         </div>
                         <div class="space-y-4">
