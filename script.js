@@ -1,8 +1,16 @@
+// =============================================================
 // HTML to Markdown Converter - Static Version
-// Built for grade 9 students using vanilla JavaScript
+// Built for grade 9 students (vanilla JavaScript, no build step)
+// Phase 0 refactor: added structure comments & JSDoc for clarity
+// =============================================================
 
+// =============================================================
+// MAIN CONTROLLER CLASS
+// Handles state, event wiring, conversion orchestration & UI updates
+// =============================================================
 class HTMLToMarkdownConverter {
     constructor() {
+    // ------------- STATE -------------
         this.currentMode = 'html-to-markdown';
         this.currentViewMode = 'side-by-side';
         this.currentOutputView = 'markdown';
@@ -24,6 +32,9 @@ class HTMLToMarkdownConverter {
         this.updateSettings();
     }
 
+    // =========================================================
+    // EVENT BINDING
+    // =========================================================
     initializeEventListeners() {
         // Mode toggle
         document.getElementById('toggle-mode-btn').addEventListener('click', () => this.toggleMode());
@@ -84,11 +95,17 @@ class HTMLToMarkdownConverter {
     if (tablesToggle) tablesToggle.addEventListener('change', () => this.updateSettings());
     }
 
+    /**
+     * Toggle between HTML→Markdown and Markdown→HTML modes.
+     */
     toggleMode() {
         this.currentMode = this.currentMode === 'html-to-markdown' ? 'markdown-to-html' : 'html-to-markdown';
         this.updateModeDisplay();
     }
 
+    /**
+     * Update UI elements when mode changes (labels & visible panels).
+     */
     updateModeDisplay() {
         const title = document.getElementById('app-title');
         const toggleText = document.getElementById('toggle-mode-text');
@@ -108,6 +125,10 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Change layout between side-by-side and stacked.
+     * @param {('side-by-side'|'stacked')} mode
+     */
     setViewMode(mode) {
         this.currentViewMode = mode;
         const contentPanels = document.getElementById('content-panels');
@@ -125,6 +146,10 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Switch converted output panel between markdown source / preview / HTML.
+     * @param {('markdown'|'preview'|'html')} view
+     */
     setOutputView(view) {
         this.currentOutputView = view;
         const sourceBtn = document.getElementById('markdown-source-btn');
@@ -157,6 +182,10 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Switch markdown input panel between raw textarea and live preview.
+     * @param {('input'|'preview')} view
+     */
     setMarkdownView(view) {
         this.currentMarkdownView = view;
         const inputBtn = document.getElementById('md-input-btn');
@@ -177,6 +206,10 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Switch generated HTML panel between source and rendered preview.
+     * @param {('source'|'preview')} view
+     */
     setHtmlView(view) {
         this.currentHtmlView = view;
         const sourceBtn = document.getElementById('html-source-view-btn');
@@ -199,12 +232,19 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Capture current rich text editor HTML.
+     */
     updateEditorContent() {
         const editor = document.getElementById('rich-editor');
         // Store the HTML content for conversion
         this.richTextContent = editor.innerHTML;
     }
 
+    /**
+     * Convert rich text (HTML) in the editor to Markdown then render HTML preview.
+     * Steps: read editor HTML → turndown → store markdown → render HTML via Marked → update stats.
+     */
     convertHtmlToMarkdown() {
         const editor = document.getElementById('rich-editor');
         const html = editor.innerHTML;
@@ -232,6 +272,9 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Convert manually entered Markdown text into HTML and show output panel.
+     */
     convertMarkdownToHtml() {
         const textarea = document.getElementById('markdown-textarea');
         const markdown = textarea.value;
@@ -258,6 +301,9 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Refresh HTML output (source + preview) & statistics.
+     */
     updateHtmlOutput() {
         const sourceContent = document.getElementById('html-output-content');
         const previewContent = document.getElementById('html-preview-content');
@@ -272,6 +318,9 @@ class HTMLToMarkdownConverter {
         stats.textContent = `Generated from ${lines} lines of Markdown • ${characters} characters`;
     }
 
+    /**
+     * Update character & line counts for markdown textarea.
+     */
     updateMarkdownStats() {
         const textarea = document.getElementById('markdown-textarea');
         const stats = document.getElementById('markdown-stats');
@@ -283,6 +332,9 @@ class HTMLToMarkdownConverter {
         stats.textContent = `${characters} characters, ${lines} lines`;
     }
 
+    /**
+     * Render live markdown preview using Marked.
+     */
     updateMarkdownPreview() {
         const textarea = document.getElementById('markdown-textarea');
         const preview = document.getElementById('markdown-preview-content');
@@ -305,10 +357,14 @@ class HTMLToMarkdownConverter {
     }
 
     // Legacy method retained for backward compatibility; now simply delegates to Marked
+    // Legacy method kept for backward compatibility / teaching reference.
     renderMarkdownPreview(markdown) {
         return marked.parse(markdown || '');
     }
 
+    /**
+     * Update word/line/character statistics for converted markdown.
+     */
     updateOutputStats() {
         const stats = document.getElementById('output-stats');
         if (!this.markdownContent) {
@@ -324,6 +380,10 @@ class HTMLToMarkdownConverter {
         stats.style.display = 'block';
     }
 
+    /**
+     * Rebuild Turndown service with current user preferences and attach plugins/rules.
+     * Safe to call repeatedly; creates a fresh Turndown instance.
+     */
     updateSettings() {
         const preserveLinks = document.getElementById('preserve-links').checked;
         const convertImages = document.getElementById('convert-images').checked;
@@ -398,6 +458,9 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Paste clipboard text into markdown textarea (if permitted by browser).
+     */
     async pasteMarkdown() {
         try {
             const text = await navigator.clipboard.readText();
@@ -409,6 +472,9 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Clear markdown input + generated HTML panel state.
+     */
     clearMarkdown() {
         document.getElementById('markdown-textarea').value = '';
         document.getElementById('html-output-panel').style.display = 'none';
@@ -417,6 +483,9 @@ class HTMLToMarkdownConverter {
         this.updateMarkdownPreview();
     }
 
+    /**
+     * Clear content depending on active mode (rich editor or markdown input).
+     */
     clearAll() {
         if (this.currentMode === 'html-to-markdown') {
             document.getElementById('rich-editor').innerHTML = '';
@@ -430,6 +499,9 @@ class HTMLToMarkdownConverter {
         this.showToast('All content cleared');
     }
 
+    /**
+     * Copy current output (markdown or HTML) to clipboard.
+     */
     async copyOutput() {
         let content = '';
         if (this.currentOutputView === 'html') {
@@ -451,6 +523,9 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Copy generated HTML (Markdown→HTML mode) to clipboard.
+     */
     async copyHtml() {
         if (!this.generatedHtml) {
             this.showToast('No HTML content to copy');
@@ -465,6 +540,9 @@ class HTMLToMarkdownConverter {
         }
     }
 
+    /**
+     * Download current converted output as .md or .html.
+     */
     downloadOutput() {
         let content, filename, mimeType;
         
@@ -486,6 +564,9 @@ class HTMLToMarkdownConverter {
         this.downloadFile(content, filename, mimeType);
     }
 
+    /**
+     * Download generated HTML file.
+     */
     downloadHtml() {
         if (!this.generatedHtml) {
             this.showToast('No HTML content to download');
@@ -495,6 +576,12 @@ class HTMLToMarkdownConverter {
         this.downloadFile(this.generatedHtml, 'converted-content.html', 'text/html');
     }
 
+    /**
+     * Generic file download helper.
+     * @param {string} content
+     * @param {string} filename
+     * @param {string} mimeType
+     */
     downloadFile(content, filename, mimeType) {
         const blob = new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
@@ -509,6 +596,9 @@ class HTMLToMarkdownConverter {
         this.showToast(`Downloaded ${filename}`);
     }
 
+    /**
+     * Show contextual help toast based on current mode.
+     */
     showHelp() {
         const helpText = this.currentMode === 'html-to-markdown' 
             ? 'Paste rich text from web pages, Word documents, or any formatted source. The tool will preserve formatting and convert it to clean Markdown.'
@@ -517,6 +607,10 @@ class HTMLToMarkdownConverter {
         this.showToast(helpText);
     }
 
+    /**
+     * Display a transient toast notification.
+     * @param {string} message
+     */
     showToast(message) {
         const toast = document.getElementById('toast');
         const content = document.getElementById('toast-content');
@@ -529,12 +623,20 @@ class HTMLToMarkdownConverter {
         }, 3000);
     }
 
+    /**
+     * Escape HTML entities (used for code/pre views).
+     * @param {string} text
+     * @returns {string}
+     */
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 }
+
+// Simple DOM helper (Phase 0 only; later may move to a module)
+function getEl(id) { return document.getElementById(id); }
 
 // Initialize the converter when the page loads
 document.addEventListener('DOMContentLoaded', function() {
